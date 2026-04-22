@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e6ccb2; --surface: #ede0d4; --surface-2: #ede0d4;
+    --border:#967062; --text: #804f3b; --muted: #804f3b;
+    --accent: #804f3b; --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); padding: 2rem 1.75rem 3rem; font-weight: 300; -webkit-font-smoothing: antialiased; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 1.25rem; margin-bottom: 1.75rem; }
+  .project-tag { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 22px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.3; }
+  h1 span { color: var(--muted); font-weight: 300; }
+  .byline { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .panel-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+  .slider-row { margin-bottom: 1.2rem; }
+  .slider-row:last-child { margin-bottom: 0; }
+  .slider-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .slider-label { font-size: 13px; font-weight: 400; }
+  .slider-val { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+  .slider-range-labels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .slider-note { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 4px; font-style: italic; }
+  input[type=range] { width: 100%; -webkit-appearance: none; height: 2px; background: var(--border); border-radius: 2px; outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--accent); }
+  
+  /* Grid updated to 3 columns to remove Risk % metric */
+  .metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 1rem; }
+  .metric { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.1rem; }
+  .metric-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .metric-val { font-size: 20px; font-weight: 400; letter-spacing: -0.02em; transition: color 0.35s ease; }
+  
+  .risk-track { height: 3px; background: var(--surface-2); border-radius: 2px; overflow: hidden; margin: 10px 0 6px; }
+  .risk-fill { height: 100%; border-radius: 2px; transition: width 0.35s ease, background 0.35s ease; }
+  .risk-level { font-size: 18px; font-weight: 400; margin-top: 2px; }
+  .risk-text { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.6; font-weight: 300; }
+  .eq-line { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .chart-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem 1rem; }
+  .legend { display: flex; gap: 18px; margin-bottom: 10px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 1px; }
+  .chart-wrap { position: relative; width: 100%; height: 240px; margin-top: 0.75rem; }
+  .chart-note { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>KNO₃ Crystallization Risk <span>/ Kidney Stone Model</span></h1>
+  <div class="byline"> By Exponential E.V.A.</div>
+  <div class="project-tag">
+    Disclaimer: We cannot actually consume KNO₃(it is toxic in high concentrations), so this calculator acts as a "medical metaphor" for understanding kidney stone formation/crystallization of salts inside the human body.</div>
+  <div class="project-tag">AI was used to assist in the development of this model (technical outline and parts of css)</div>
+  </header>
+<div class="panel">
+  <div class="panel-label">~Patient conditions~</div>
+
+  <div class="slider-row">
+    <div class="slider-top">
+      <span class="slider-label">Body temperature (°C)</span>
+      <span class="slider-val" id="temp-out">37.0°C</span>
+    </div>
+    <input type="range" min="35" max="42" step="0.1" value="37" id="temp" oninput="update()">
+    <div class="slider-range-labels"><span>35°C=hypothermia</span><span>42°C=hyperthermia</span></div>
+    <div class="slider-note">*since the human body temp range is only 35-42°C, it contributes only ~5% of total risk</div>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-top">
+      <span class="slider-label">Hydration level (percent)</span>
+      <span class="slider-val" id="hydration-out">80%</span>
+    </div>
+    <input type="range" min="60" max="100" step="1" value="80" id="hydration" oninput="update()">
+    <div class="slider-range-labels"><span>60% = severely dehydrated</span><span>100% = fully hydrated</span></div>
+  </div>
+
+  <div class="slider-row">
+    <div class="slider-top">
+      <span class="slider-label">Solute concentration (g/100mL)</span>
+      <span class="slider-val" id="conc-out">0 g/100mL</span>
+    </div>
+    <input type="range" min="0" max="15" step="0.5" value="0" id="conc" oninput="update()">
+    <div class="slider-range-labels"><span>0 = no solute</span><span>15 g/100mL = well above saturation</span></div>
+  </div>
+</div>
+
+<div class="metrics">
+  <div class="metric"><div class="metric-label">Max solubility</div><div class="metric-val" id="max-sol">—</div></div>
+  <div class="metric"><div class="metric-label">Saturation ratio</div><div class="metric-val" id="sat-ratio">—</div></div>
+  <div class="metric"><div class="metric-label">Margin</div><div class="metric-val" id="margin">—</div></div>
+</div>
+
+<div class="panel">
+  <div class="panel-label">Crystallization risk</div>
+  <div class="risk-track"><div class="risk-fill" id="risk-bar"></div></div>
+  <div class="risk-level" id="risk-label">—</div>
+  <div class="risk-text" id="risk-desc"></div>
+  <div class="eq-line" id="eq-box"></div>
+</div>
+
+<div class="chart-panel">
+  <div class="panel-label">~The solubility curve～</div>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#2a4a6b;"></span> Our Data Set</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#c0522a;border-radius:0;height:2px;width:14px;"></span>Exponential model</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#4a7c3f;border-radius:0;height:2px;width:14px;"></span>Temperature</span>
+  </div>
+  <div class="chart-wrap">
+    <canvas id="chart" role="img" aria-label="Scatter plot of KNO3 solubility(y) vs temperature(x) with exponential curve fit"></canvas>
+  </div>
+  <p class="chart-note">Our data (the blue dots) · exponential model (red) · selected temperature in the sliders (green dashed)</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var data = [
+  {x:10,y:2},{x:15,y:4},{x:20,y:5},{x:25,y:5.5},{x:30,y:8},
+  {x:35,y:10},{x:40,y:12},{x:45,y:11},{x:50,y:13},{x:55,y:15},
+  {x:60,y:20},{x:65,y:21},{x:70,y:22},{x:75,y:28},{x:80,y:34},
+  {x:85,y:36},{x:90,y:38},{x:95,y:44},{x:100,y:49}
+];
+
+let r = 0.0274;
+let a = 3.39;
+
+function solubility(t) { 
+  return a * Math.exp(r * t); }
+
+var curveData = [];
+for (var t=0; t<=100; t++) curveData.push({ x:t, y:solubility(t) });
+
+var ctx = document.getElementById('chart').getContext('2d');
+var chart = new Chart(ctx, {
+  type: 'scatter',
+  data: { datasets: [
+    { data, backgroundColor:'#2a4a6b', pointRadius:4, pointHoverRadius:6, showLine:false },
+    { data:curveData, borderColor:'#c0502a', backgroundColor:'transparent', pointRadius:0, showLine:true, borderWidth:1.5, tension:0.4 },
+    { data:[], borderColor:'#4a7c3f', backgroundColor:'transparent', pointRadius:0, showLine:true, borderWidth:1, borderDash:[5,4] }
+  ]},
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:false } },
+    scales:{
+      x:{ title:{display:true,text:'Temperature (°C)',font:{size:11,family:"'DM Mono',monospace"},color:'#8a8478'}, min:0, max:100, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{family:"'DM Mono',monospace",size:10},color:'#8a8478'} },
+      y:{ title:{display:true,text:'KNO₃ (g / 100 mL)',font:{size:11,family:"'DM Mono',monospace"},color:'#8a8478'}, min:0, max:50, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{family:"'DM Mono',monospace",size:10},color:'#8a8478'} }
+    }
+  }
+});
+
+function update() {
+  var T = parseFloat(document.getElementById('temp').value);
+  var H = parseInt(document.getElementById('hydration').value);
+  var C = parseFloat(document.getElementById('conc').value);
+
+  document.getElementById('temp-out').textContent = T.toFixed(1)+'°C';
+  document.getElementById('hydration-out').textContent = H+'%';
+  document.getElementById('conc-out').textContent = C+' g/100mL';
+
+  var baseSol = solubility(T);
+  var tempPenalty = Math.max(0.95, 1 - 0.01 * (T - 37));
+  var maxSol = baseSol * tempPenalty;
+
+  var hydFactor = 1 + 0.8 * Math.pow((100 - H) / 100, 0.6);
+  var effectiveConc = C * hydFactor;
+
+  var ratio = C === 0 ? 0 : effectiveConc / maxSol;
+  var margin = maxSol - effectiveConc;
+
+  document.getElementById('max-sol').textContent   = maxSol.toFixed(2)+' g/100mL';
+  document.getElementById('sat-ratio').textContent = C === 0 ? '—' : ratio.toFixed(3)+'×';
+  document.getElementById('margin').textContent    = C === 0 ? '—' : (margin>=0?'+':'')+margin.toFixed(2);
+
+  let riskBarPct, riskColor, riskText, riskDesc;
+  if (C === 0) {
+    riskBarPct=0; riskColor='var(--muted)'; riskText='No solute';
+    riskDesc='Set a solute concentration to model crystallization risk.';
+  } else if (ratio < 0.5) {
+    riskBarPct=ratio/0.5*20; riskColor='#2d7a55'; riskText='Low :)';
+    riskDesc='Well below saturation. Solute dissolves easily and no crystallization is expected at this temperature and hydration level';
+  } else if (ratio < 0.8) {
+    riskBarPct=20+(ratio-0.5)/0.3*30; riskColor='#b07a1a'; riskText='Moderate :/';
+    riskDesc='Approaching saturation. A further drop in hydration or increase in concentration could cause it to potentially crystallize.';
+  } else if (ratio < 1.0) {
+    riskBarPct=50+(ratio-0.8)/0.2*25; riskColor='#c0502a'; riskText='High :(';
+    riskDesc='Near the saturation threshold. Crystal nucleation (the first step of crystallization) is likely; this is the stage at which most kidney stone formation begins.';
+  } else {
+    riskBarPct=Math.min(97, 75+(ratio-1.0)*22); riskColor='#8b1a1a'; riskText='Critical >:(';
+    riskDesc='Supersaturated. Concentration exceeds what can remain dissolved at this temperature. Crystals are actively precipitating.';
+  }
+
+  document.getElementById('risk-bar').style.width      = riskBarPct.toFixed(1)+'%';
+  document.getElementById('risk-bar').style.background = riskColor;
+  document.getElementById('risk-label').textContent    = riskText;
+  document.getElementById('risk-label').style.color    = riskColor;
+  document.getElementById('risk-desc').textContent     = riskDesc;
+  document.getElementById('eq-box').textContent =
+    'y = '+a.toFixed(4)+' · e^('+r.toFixed(5)+'x)  ·  maxSol('+T.toFixed(1)+'°C) = '+maxSol.toFixed(2)+' g/100mL  ·  hydFactor = '+hydFactor.toFixed(3)+'×';
+
+  chart.data.datasets[2].data = [{x:T,y:0},{x:T,y:50}];
+  chart.update('none');
+}
+
+update();
+</script>
+</body>
+</html>
